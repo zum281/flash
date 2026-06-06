@@ -11,6 +11,7 @@ struct Card {
   char answer[MAX_LINE_SIZE];
   int correct;
 };
+enum CardState { SEPARATOR, QUESTION, ANSWER };
 
 size_t load_cards(const char *filename, struct Card *out, size_t capacity);
 
@@ -30,7 +31,7 @@ int main(void) {
 size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
   (void)out;
   const char *separator = "---";
-  int state = 2; // assume start with question; start with sep is handled
+  enum CardState state = QUESTION;
 
   FILE *fp;
   char s[MAX_LINE_SIZE];
@@ -39,26 +40,27 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
   while (fgets(s, MAX_LINE_SIZE, fp) != NULL) {
     // TODO: strip new lines
     if (!strcmp(s, separator)) {
-      state = 1; // EXPECT_QUESTION
+      state = QUESTION;
       continue;
     }
 
     switch (state) {
-    case 1:
+    case SEPARATOR:
       break;
-    case 2: // parse question
+    case QUESTION:
+      // TODO: parse question
       printf("Q: %s\n", s);
       break;
-    case 3:
-      // parse answer
+    case ANSWER:
+      // TODO: parse answer
       printf("A: %s\n", s);
       break;
     default:
       printf("unrecognised state");
       break;
     }
-    if (state == 3)
-      state = 1;
+    if (state == ANSWER)
+      state = SEPARATOR;
     else
       state++;
   }
