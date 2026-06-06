@@ -12,11 +12,12 @@ struct Card {
   char answer[MAX_LINE_SIZE];
   int correct;
 };
+
 enum CardState { SEPARATOR, QUESTION, ANSWER };
 
 size_t load_cards(const char *filename, struct Card *out, size_t capacity);
 void shuffle_cards(struct Card *deck, int size);
-void quiz_card(struct Card card, size_t index, size_t total);
+int quiz_card(struct Card card, size_t index, size_t total);
 
 int main(int argc, char **argv) {
 
@@ -26,6 +27,7 @@ int main(int argc, char **argv) {
   }
   char *filename = argv[1];
   size_t loaded;
+  int score = 0;
   struct Card deck[MAX_DECK_SIZE];
 
   loaded = load_cards(filename, deck, MAX_DECK_SIZE);
@@ -35,9 +37,16 @@ int main(int argc, char **argv) {
   printf("loaded %zu cards\n", loaded);
 
   for (size_t i = 0; i < loaded; i++) {
-    quiz_card(deck[i], i + 1, loaded);
+    score += quiz_card(deck[i], i + 1, loaded);
   }
 
+  double scorePerc = 100.0 * score / loaded;
+
+  printf("──────────────────────────────────────\n");
+  printf("Session complete.\n");
+  printf("Score: %d/%zu (%.1f%%)\n", score, loaded, scorePerc);
+  // TODO: log to file
+  // Logged to flash.log
   return 0;
 }
 
@@ -106,9 +115,11 @@ void shuffle_cards(struct Card *deck, int size) {
   }
 }
 
-void quiz_card(struct Card card, size_t index, size_t total) {
+int quiz_card(struct Card card, size_t index, size_t total) {
   char buf[10];
   char c = '\0';
+  int correct;
+
   printf("Card %zu of %zu - press Enter to see the answer\n\n", index, total);
   printf("\t%s\n\n", card.question);
   printf("[Enter]");
@@ -130,15 +141,16 @@ void quiz_card(struct Card card, size_t index, size_t total) {
     switch (c) {
     case 'y':
     case 'Y':
-      card.correct = 1;
+      correct = 1;
       break;
     case 'n':
     case 'N':
-      card.correct = 0;
+      correct = 0;
       break;
     default:
       printf("Valid answers are y/n. Give your answer again [y/n] ");
     }
   };
   printf("\n\n");
+  return correct;
 }
