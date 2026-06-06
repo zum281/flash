@@ -23,7 +23,14 @@ int main(void) {
 
   loaded = load_cards(filename, deck, MAX_DECK_SIZE);
 
-  printf("%zu\n", loaded);
+  printf("loaded %zu cards\n", loaded);
+
+  for (size_t i = 0; i < loaded; i++) {
+    printf("Q: %s\n", deck[i].question);
+    printf("A: %s\n", deck[i].answer);
+    printf("correct: %s\n", deck[i].correct ? "true" : "false");
+    printf("\n");
+  }
 
   return 0;
 }
@@ -37,8 +44,14 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
   char s[MAX_LINE_SIZE];
   fp = fopen(filename, "r");
 
+  size_t loaded = 0;
+
   while (fgets(s, MAX_LINE_SIZE, fp) != NULL) {
     // TODO: strip new lines
+    if (loaded == capacity) {
+      printf("capacity reached\n");
+      break;
+    }
     if (!strcmp(s, separator)) {
       state = QUESTION;
       continue;
@@ -48,15 +61,17 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
     case SEPARATOR:
       break;
     case QUESTION:
-      // TODO: parse question
-      printf("Q: %s\n", s);
+      // TODO: strip \n from end of string
+      strcpy(out[loaded].question, s);
       break;
     case ANSWER:
-      // TODO: parse answer
-      printf("A: %s\n", s);
+      // TODO: strip \n from end of string
+      strcpy(out[loaded].answer, s);
+      out[loaded].correct = 0;
+      loaded++;
       break;
     default:
-      printf("unrecognised state");
+      printf("unrecognised state\n");
       break;
     }
     if (state == ANSWER)
@@ -66,5 +81,5 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
   }
 
   fclose(fp);
-  return capacity;
+  return loaded;
 }
