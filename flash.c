@@ -15,11 +15,15 @@ enum CardState { SEPARATOR, QUESTION, ANSWER };
 
 size_t load_cards(const char *filename, struct Card *out, size_t capacity);
 
-int main(void) {
+int main(int argc, char **argv) {
+
+  if (argc < 2) {
+    printf("usage: flash <cards>\n");
+    return 1;
+  }
+  char *filename = argv[1];
   size_t loaded;
   struct Card deck[MAX_DECK_SIZE];
-  // TODO: get from args
-  char *filename = "./cards.txt";
 
   loaded = load_cards(filename, deck, MAX_DECK_SIZE);
 
