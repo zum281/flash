@@ -49,7 +49,6 @@ void shuffle_cards(struct Card *deck, int size) {
 
   for (int i = size - 1; i > 0; i--) {
     int j = rand() % size;
-    printf("%d\n", j);
     struct Card tmp = deck[j];
     deck[j] = deck[i];
     deck[i] = tmp;
@@ -67,25 +66,30 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
   size_t loaded = 0;
 
   while (fgets(s, MAX_LINE_SIZE, fp) != NULL) {
-    // TODO: strip new lines
     if (loaded == capacity) {
       printf("capacity reached\n");
       break;
     }
+
+    // Skip new lines
+    if (!strcmp(s, "\n")) {
+      continue;
+    }
+
+    // Skip separator
     if (!strcmp(s, separator)) {
       state = QUESTION;
       continue;
     }
 
+    s[strlen(s) - 1] = '\0';
     switch (state) {
     case SEPARATOR:
       break;
     case QUESTION:
-      // TODO: strip \n from end of string
       strcpy(out[loaded].question, s);
       break;
     case ANSWER:
-      // TODO: strip \n from end of string
       strcpy(out[loaded].answer, s);
       out[loaded].correct = 0;
       loaded++;
