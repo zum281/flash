@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define MAX_LINE_SIZE 128
 #define MAX_DECK_SIZE 100
@@ -14,6 +15,7 @@ struct Card {
 enum CardState { SEPARATOR, QUESTION, ANSWER };
 
 size_t load_cards(const char *filename, struct Card *out, size_t capacity);
+void shuffle_cards(struct Card *deck, int size);
 
 int main(int argc, char **argv) {
 
@@ -27,6 +29,8 @@ int main(int argc, char **argv) {
 
   loaded = load_cards(filename, deck, MAX_DECK_SIZE);
 
+  shuffle_cards(deck, (int)loaded);
+
   printf("loaded %zu cards\n", loaded);
 
   for (size_t i = 0; i < loaded; i++) {
@@ -39,8 +43,20 @@ int main(int argc, char **argv) {
   return 0;
 }
 
+void shuffle_cards(struct Card *deck, int size) {
+  time_t now = time(NULL);
+  srand((unsigned)now);
+
+  for (int i = size - 1; i > 0; i--) {
+    int j = rand() % size;
+    printf("%d\n", j);
+    struct Card tmp = deck[j];
+    deck[j] = deck[i];
+    deck[i] = tmp;
+  }
+}
+
 size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
-  (void)out;
   const char *separator = "---";
   enum CardState state = QUESTION;
 
