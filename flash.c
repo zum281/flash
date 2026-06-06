@@ -16,6 +16,7 @@ enum CardState { SEPARATOR, QUESTION, ANSWER };
 
 size_t load_cards(const char *filename, struct Card *out, size_t capacity);
 void shuffle_cards(struct Card *deck, int size);
+void quiz_card(struct Card card, size_t index, size_t total);
 
 int main(int argc, char **argv) {
 
@@ -34,25 +35,10 @@ int main(int argc, char **argv) {
   printf("loaded %zu cards\n", loaded);
 
   for (size_t i = 0; i < loaded; i++) {
-    printf("Q: %s\n", deck[i].question);
-    printf("A: %s\n", deck[i].answer);
-    printf("correct: %s\n", deck[i].correct ? "true" : "false");
-    printf("\n");
+    quiz_card(deck[i], i + 1, loaded);
   }
 
   return 0;
-}
-
-void shuffle_cards(struct Card *deck, int size) {
-  time_t now = time(NULL);
-  srand((unsigned)now);
-
-  for (int i = size - 1; i > 0; i--) {
-    int j = rand() % size;
-    struct Card tmp = deck[j];
-    deck[j] = deck[i];
-    deck[i] = tmp;
-  }
 }
 
 size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
@@ -106,4 +92,53 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
 
   fclose(fp);
   return loaded;
+}
+
+void shuffle_cards(struct Card *deck, int size) {
+  time_t now = time(NULL);
+  srand((unsigned)now);
+
+  for (int i = size - 1; i > 0; i--) {
+    int j = rand() % size;
+    struct Card tmp = deck[j];
+    deck[j] = deck[i];
+    deck[i] = tmp;
+  }
+}
+
+void quiz_card(struct Card card, size_t index, size_t total) {
+  char buf[10];
+  char c = '\0';
+  printf("Card %zu of %zu - press Enter to see the answer\n\n", index, total);
+  printf("\t%s\n\n", card.question);
+  printf("[Enter]");
+
+  while (1) {
+    fgets(buf, sizeof(buf), stdin);
+    c = buf[0];
+
+    if ((int)c == 10) {
+      break;
+    }
+  }
+  printf("\t%s\n\n", card.answer);
+
+  printf("Got it? [y/n] ");
+  while (c != 'y' && c != 'Y' && c != 'n' && c != 'N') {
+    fgets(buf, sizeof(buf), stdin);
+    c = buf[0];
+    switch (c) {
+    case 'y':
+    case 'Y':
+      card.correct = 1;
+      break;
+    case 'n':
+    case 'N':
+      card.correct = 0;
+      break;
+    default:
+      printf("Valid answers are y/n. Give your answer again [y/n] ");
+    }
+  };
+  printf("\n\n");
 }
