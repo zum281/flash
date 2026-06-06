@@ -18,6 +18,7 @@ enum CardState { SEPARATOR, QUESTION, ANSWER };
 size_t load_cards(const char *filename, struct Card *out, size_t capacity);
 void shuffle_cards(struct Card *deck, int size);
 int quiz_card(struct Card card, size_t index, size_t total);
+int append_session(const char *log_filename, size_t total, size_t correct);
 
 int main(int argc, char **argv) {
 
@@ -45,8 +46,31 @@ int main(int argc, char **argv) {
   printf("──────────────────────────────────────\n");
   printf("Session complete.\n");
   printf("Score: %d/%zu (%.1f%%)\n", score, loaded, scorePerc);
-  // TODO: log to file
-  // Logged to flash.log
+
+  printf("\n");
+  printf("Save to session? [y/n] ");
+
+  char buf[10];
+  char save = '\0';
+  while (save != 'y' && save != 'Y' && save != 'n' && save != 'N') {
+    fgets(buf, sizeof(buf), stdin);
+    save = buf[0];
+    switch (save) {
+    case 'y':
+    case 'Y':
+      if (!append_session("flash.log", loaded, score)) {
+        printf("Logged to flash.log\n");
+      } else {
+        printf("Error while saving session\n");
+      }
+      break;
+    case 'n':
+    case 'N':
+      break;
+    default:
+      printf("Valid answers are y/n. Give your answer again [y/n] ");
+    }
+  };
   return 0;
 }
 
@@ -153,4 +177,21 @@ int quiz_card(struct Card card, size_t index, size_t total) {
   };
   printf("\n\n");
   return correct;
+}
+
+int append_session(const char *filename, size_t total, size_t correct) {
+  FILE *fp;
+  fp = fopen(filename, "a");
+
+  if (fp == NULL) {
+    return 1;
+  }
+
+  time_t ts = time(NULL);
+  char *now = ctime(&ts);
+  now[strlen(now) - 1] = '\0';
+
+  fprintf(fp, "%s - %zu/%zu\n", now, correct, total);
+  fclose(fp);
+  return 0;
 }
