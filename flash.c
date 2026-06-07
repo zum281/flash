@@ -13,19 +13,22 @@
 int main(int argc, char **argv) {
   atexit(exit_alternate_buffer);
 
-  char *filename = get_filename(argc, argv);
+  struct FlashOpts opts = get_opts(argc, argv);
+
   size_t loaded;
   int score = 0;
   struct Card deck[MAX_DECK_SIZE];
 
-  loaded = load_cards(filename, deck, MAX_DECK_SIZE);
+  loaded = load_cards(opts.filename, deck, MAX_DECK_SIZE);
 
   if (loaded == 0) {
     printf("No cards loaded, exiting...\n");
     exit(0);
   }
 
-  shuffle_cards(deck, loaded);
+  if (!opts.no_shuffle) {
+    shuffle_cards(deck, loaded);
+  }
 
   enter_alternate_buffer();
 
