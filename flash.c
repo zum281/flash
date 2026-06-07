@@ -1,3 +1,4 @@
+#include "lib/term.h"
 #define _DEFAULT_SOURCE
 
 #include <stdio.h>
@@ -22,9 +23,14 @@ int main(int argc, char **argv) {
   loaded = load_cards(opts.filepath, deck, MAX_DECK_SIZE);
 
   if (loaded == 0) {
-    printf("No cards loaded, exiting...\n");
+    printf("flash: no cards found in deck\n");
     exit(0);
   }
+
+  const char *filename = get_filename(opts.filepath);
+
+  // TODO: print initial status
+  // print_status(filename);
 
   if (!opts.no_shuffle) {
     shuffle_cards(deck, loaded);
@@ -37,6 +43,6 @@ int main(int argc, char **argv) {
   }
 
   show_score(score, loaded);
-  save_to_session(score, loaded, get_filename(opts.filepath));
+  save_to_session(score, loaded, filename);
   return 0;
 }

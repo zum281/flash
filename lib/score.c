@@ -40,32 +40,17 @@ void show_score(int score, size_t total) {
 }
 
 void save_to_session(int score, size_t total, const char *deck_name) {
-  char buf[10];
-  char save = '\0';
-
   print_line("Save to session? [y/n] ");
 
-  while (save != 'y' && save != 'Y' && save != 'n' && save != 'N') {
-    if (fgets(buf, sizeof(buf), stdin) == NULL) {
-      fprintf(stderr, "flash: no input, exiting\n");
-      exit(1);
-    }
+  int save = wait_for_yes_no();
 
-    save = buf[0];
-    switch (save) {
-    case 'y':
-    case 'Y':
-      if (!append_session("flash.log", total, score, deck_name)) {
-        print_line("Logged to flash.log\n");
-      } else {
-        perror("flash");
-      }
-      break;
-    case 'n':
-    case 'N':
-      break;
-    default:
-      print_line("Valid answers are y/n. Give your answer again [y/n] ");
-    }
-  };
+  if (!save) {
+    exit(0);
+  }
+
+  if (!append_session("flash.log", total, score, deck_name)) {
+    print_line("Logged to flash.log\n");
+  } else {
+    perror("flash");
+  }
 }

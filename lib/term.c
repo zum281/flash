@@ -69,3 +69,52 @@ void print_card(char rows[][MAX_LINE_SIZE], size_t size) {
     }
   }
 }
+
+void print_summary(const char *filename) {
+  (void)filename;
+  printf("Summary");
+}
+
+void wait_for_enter(void) {
+  char buf[10];
+  char c = '\0';
+
+  while (1) {
+    if (fgets(buf, sizeof(buf), stdin) == NULL) {
+      fprintf(stderr, "flash: no input, exiting\n");
+      exit(1);
+    }
+    c = buf[0];
+    if (c == '\n') {
+      break;
+    }
+  }
+}
+
+int wait_for_yes_no(void) {
+  char buf[10];
+  char c = '\0';
+
+  while (c != 'y' && c != 'Y' && c != 'n' && c != 'N') {
+    if (fgets(buf, sizeof(buf), stdin) == NULL) {
+      fprintf(stderr, "flash: no input, exiting\n");
+      exit(1);
+    }
+    c = buf[0];
+    switch (c) {
+    case 'y':
+    case 'Y':
+      return 1;
+      break;
+    case 'n':
+    case 'N':
+      return 0;
+      break;
+    default:
+      print_line("Valid answers are y/n. Give your answer again [y/n] ");
+    }
+  };
+
+  fprintf(stderr, "flash: impossible state reached\n");
+  exit(1);
+}

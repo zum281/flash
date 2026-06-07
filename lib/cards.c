@@ -94,11 +94,6 @@ void shuffle_cards(struct Card *deck, size_t size) {
 }
 
 int quiz_card(struct Card *card, size_t index, size_t total) {
-
-  char buf[10];
-  char c = '\0';
-  int correct;
-
   char question_rows[QUESTION_LINES][MAX_LINE_SIZE];
   char answer_rows[ANSWER_LINES][MAX_LINE_SIZE];
 
@@ -112,37 +107,9 @@ int quiz_card(struct Card *card, size_t index, size_t total) {
 
   print_card(question_rows, QUESTION_LINES);
 
-  while (1) {
-    if (fgets(buf, sizeof(buf), stdin) == NULL) {
-      fprintf(stderr, "flash: no input, exiting\n");
-      exit(1);
-    }
-    c = buf[0];
-    if (c == '\n') {
-      break;
-    }
-  }
+  wait_for_enter();
 
   print_card(answer_rows, ANSWER_LINES);
 
-  while (c != 'y' && c != 'Y' && c != 'n' && c != 'N') {
-    if (fgets(buf, sizeof(buf), stdin) == NULL) {
-      fprintf(stderr, "flash: no input, exiting\n");
-      exit(1);
-    }
-    c = buf[0];
-    switch (c) {
-    case 'y':
-    case 'Y':
-      correct = 1;
-      break;
-    case 'n':
-    case 'N':
-      correct = 0;
-      break;
-    default:
-      print_line("Valid answers are y/n. Give your answer again [y/n] ");
-    }
-  };
-  return correct;
+  return wait_for_yes_no();
 }
