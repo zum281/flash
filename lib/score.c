@@ -42,7 +42,6 @@ int get_score(struct Card *deck, size_t total) {
 double get_score_perc(int score, size_t total) { return 100.0 * score / total; }
 
 void show_score(int score, size_t total) {
-
   double score_perc = get_score_perc(score, total);
 
   char rows[SCORE_LINES][MAX_LINE_SIZE];

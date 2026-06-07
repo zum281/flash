@@ -37,6 +37,7 @@ void print_line(char *s) {
 
   int start_col = (ws.ws_col - get_row_width(line, padding)) / 2;
 
+  printf("\n\n");
   printf("\033[%dG", start_col);
   printf("%s", line);
 }
