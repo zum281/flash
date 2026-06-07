@@ -57,6 +57,7 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
       break;
     case ANSWER:
       strcpy(out[loaded].answer, line);
+      out[loaded].correct = 0;
       loaded++;
       break;
     default:
@@ -85,7 +86,7 @@ void shuffle_cards(struct Card *deck, size_t size) {
   }
 }
 
-int quiz_card(struct Card *card, size_t index, size_t total) {
+void quiz_card(struct Card *card, size_t index, size_t total) {
   char question_rows[QUESTION_LINES][MAX_LINE_SIZE];
   char answer_rows[ANSWER_LINES][MAX_LINE_SIZE];
 
@@ -103,5 +104,6 @@ int quiz_card(struct Card *card, size_t index, size_t total) {
 
   print_card(answer_rows, ANSWER_LINES);
 
-  return wait_for_yes_no();
+  int correct = wait_for_yes_no();
+  card->correct = correct;
 }

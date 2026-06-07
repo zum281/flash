@@ -29,6 +29,16 @@ int append_session(size_t total, size_t correct, const char *deck_name) {
   return 0;
 }
 
+int get_score(struct Card *deck, size_t total) {
+  int score = 0;
+
+  for (size_t i = 0; i < total; i++) {
+    score += deck[i].correct;
+  }
+
+  return score;
+}
+
 double get_score_perc(int score, size_t total) { return 100.0 * score / total; }
 
 void show_score(int score, size_t total) {
