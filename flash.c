@@ -1,3 +1,5 @@
+#define _DEFAULT_SOURCE
+
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,17 +12,24 @@
 struct Card {
   char question[MAX_LINE_SIZE];
   char answer[MAX_LINE_SIZE];
-  int correct;
 };
 
 enum CardState { SEPARATOR, QUESTION, ANSWER };
+int in_alternate = 0;
 
 size_t load_cards(const char *filename, struct Card *out, size_t capacity);
 void shuffle_cards(struct Card *deck, int size);
 int quiz_card(struct Card card, size_t index, size_t total);
 int append_session(const char *log_filename, size_t total, size_t correct);
+void exit_alternate_buffer(void) {
+  if (in_alternate) {
+    printf("\033[?1049l");
+  }
+}
 
 int main(int argc, char **argv) {
+
+  atexit(exit_alternate_buffer);
 
   if (argc < 2) {
     printf("usage: flash <cards>\n");
@@ -33,9 +42,18 @@ int main(int argc, char **argv) {
 
   loaded = load_cards(filename, deck, MAX_DECK_SIZE);
 
+  if (loaded == 0) {
+    printf("No cards loaded, exiting...\n");
+    exit(0);
+  }
+
   shuffle_cards(deck, (int)loaded);
 
   printf("loaded %zu cards\n", loaded);
+
+  // Enter alternate buffer
+  printf("\033[?1049h");
+  in_alternate = 1;
 
   for (size_t i = 0; i < loaded; i++) {
     score += quiz_card(deck[i], i + 1, loaded);
@@ -61,7 +79,7 @@ int main(int argc, char **argv) {
       if (!append_session("flash.log", loaded, score)) {
         printf("Logged to flash.log\n");
       } else {
-        printf("Error while saving session\n");
+        perror("flash");
       }
       break;
     case 'n':
@@ -81,6 +99,10 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
   FILE *fp;
   char s[MAX_LINE_SIZE];
   fp = fopen(filename, "r");
+  if (fp == NULL) {
+    perror("flash");
+    exit(1);
+  }
 
   size_t loaded = 0;
 
@@ -95,13 +117,15 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
       continue;
     }
 
+    // strip away \n
+    s[strlen(s) - 1] = '\0';
+
     // Skip separator
     if (!strcmp(s, separator)) {
       state = QUESTION;
       continue;
     }
 
-    s[strlen(s) - 1] = '\0';
     switch (state) {
     case SEPARATOR:
       break;
@@ -110,7 +134,6 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
       break;
     case ANSWER:
       strcpy(out[loaded].answer, s);
-      out[loaded].correct = 0;
       loaded++;
       break;
     default:
