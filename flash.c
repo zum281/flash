@@ -120,8 +120,16 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
       continue;
     }
 
+    // skip empty lines
+    if (strlen(s) == 0) {
+      continue;
+    }
     // strip away \n
-    s[strlen(s) - 1] = '\0';
+    char *last_c = &s[strlen(s) - 1];
+    if (*last_c == '\n') {
+
+      *last_c = '\0';
+    }
 
     // Skip separator
     if (!strcmp(s, separator)) {
