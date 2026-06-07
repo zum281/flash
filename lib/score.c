@@ -134,7 +134,7 @@ int print_summary(const char *filename) {
 
   fclose(fp);
 
-  char summary_card[2][MAX_LINE_SIZE];
+  char summary_card[SUMMARY_LINES][MAX_LINE_SIZE];
   if (records_num == 0) {
 
     snprintf(summary_card[0], sizeof(summary_card[0]),
