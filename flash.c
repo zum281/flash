@@ -131,6 +131,10 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
 
     switch (state) {
     case SEPARATOR:
+      if (strcmp(s, separator)) {
+        fprintf(stderr, "flash: expected SEPARATOR, got %s. exiting\n", s);
+        exit(1);
+      }
       break;
     case QUESTION:
       strcpy(out[loaded].question, s);
