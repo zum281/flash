@@ -19,7 +19,7 @@ int in_alternate = 0;
 
 size_t load_cards(const char *filename, struct Card *out, size_t capacity);
 void shuffle_cards(struct Card *deck, int size);
-int quiz_card(struct Card card, size_t index, size_t total);
+int quiz_card(struct Card *card, size_t index, size_t total);
 int append_session(const char *log_filename, size_t total, size_t correct);
 void exit_alternate_buffer(void) {
   if (in_alternate) {
@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
   in_alternate = 1;
 
   for (size_t i = 0; i < loaded; i++) {
-    score += quiz_card(deck[i], i + 1, loaded);
+    score += quiz_card(&deck[i], i + 1, loaded);
   }
 
   double scorePerc = 100.0 * score / loaded;
@@ -162,13 +162,13 @@ void shuffle_cards(struct Card *deck, int size) {
   }
 }
 
-int quiz_card(struct Card card, size_t index, size_t total) {
+int quiz_card(struct Card *card, size_t index, size_t total) {
   char buf[10];
   char c = '\0';
   int correct;
 
   printf("Card %zu of %zu - press Enter to see the answer\n\n", index, total);
-  printf("\t%s\n\n", card.question);
+  printf("\t%s\n\n", card->question);
   printf("[Enter]");
 
   while (1) {
@@ -179,7 +179,7 @@ int quiz_card(struct Card card, size_t index, size_t total) {
       break;
     }
   }
-  printf("\t%s\n\n", card.answer);
+  printf("\t%s\n\n", card->answer);
 
   printf("Got it? [y/n] ");
   while (c != 'y' && c != 'Y' && c != 'n' && c != 'N') {
