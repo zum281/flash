@@ -1,9 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "cards.h"
+#include "term.h"
+
+#define QUESTION_LINES 3
+#define ANSWER_LINES 2
 
 size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
   const char *separator = "---";
@@ -88,13 +94,23 @@ void shuffle_cards(struct Card *deck, size_t size) {
 }
 
 int quiz_card(struct Card *card, size_t index, size_t total) {
+
   char buf[10];
   char c = '\0';
   int correct;
 
-  printf("Card %zu of %zu - press Enter to see the answer\n\n", index, total);
-  printf("\t%s\n\n", card->question);
-  printf("[Enter]");
+  char question_rows[QUESTION_LINES][MAX_LINE_SIZE];
+  char answer_rows[ANSWER_LINES][MAX_LINE_SIZE];
+
+  snprintf(question_rows[0], sizeof(question_rows[0]),
+           "Card %zu of %zu - press Enter to see the answer", index, total);
+  snprintf(question_rows[1], sizeof(question_rows[1]), "%s", card->question);
+  snprintf(question_rows[2], sizeof(question_rows[2]), "[Enter]");
+
+  snprintf(answer_rows[0], sizeof(answer_rows[0]), "%s", card->answer);
+  snprintf(answer_rows[1], sizeof(answer_rows[1]), "Got it? [y/n] ");
+
+  print_card(question_rows, QUESTION_LINES);
 
   while (1) {
     if (fgets(buf, sizeof(buf), stdin) == NULL) {
@@ -106,9 +122,9 @@ int quiz_card(struct Card *card, size_t index, size_t total) {
       break;
     }
   }
-  printf("\t%s\n\n", card->answer);
 
-  printf("Got it? [y/n] ");
+  print_card(answer_rows, ANSWER_LINES);
+
   while (c != 'y' && c != 'Y' && c != 'n' && c != 'N') {
     if (fgets(buf, sizeof(buf), stdin) == NULL) {
       fprintf(stderr, "flash: no input, exiting\n");
@@ -125,9 +141,8 @@ int quiz_card(struct Card *card, size_t index, size_t total) {
       correct = 0;
       break;
     default:
-      printf("Valid answers are y/n. Give your answer again [y/n] ");
+      print_line("Valid answers are y/n. Give your answer again [y/n] ");
     }
   };
-  printf("\n\n");
   return correct;
 }

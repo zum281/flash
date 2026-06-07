@@ -8,6 +8,8 @@
 #include "lib/score.h"
 #include "lib/utils.h"
 
+#define MAX_DECK_SIZE 100
+
 int main(int argc, char **argv) {
   atexit(exit_alternate_buffer);
 
@@ -28,11 +30,9 @@ int main(int argc, char **argv) {
   enter_alternate_buffer();
 
   for (size_t i = 0; i < loaded; i++) {
-    clear_screen();
     score += quiz_card(&deck[i], i + 1, loaded);
   }
 
-  clear_screen();
   show_score(score, loaded);
   save_to_session(score, loaded);
   return 0;

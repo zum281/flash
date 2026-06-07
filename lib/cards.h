@@ -2,9 +2,7 @@
 #define CARDS_H
 
 #include <stddef.h>
-
-#define MAX_LINE_SIZE 256
-#define MAX_DECK_SIZE 100
+#include "term.h"
 
 struct Card {
   char question[MAX_LINE_SIZE];
@@ -12,6 +10,7 @@ struct Card {
 };
 
 enum CardState { SEPARATOR, QUESTION, ANSWER };
+
 
 size_t load_cards(const char *filename, struct Card *out, size_t capacity);
 void shuffle_cards(struct Card *deck, size_t size);
