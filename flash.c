@@ -71,7 +71,10 @@ int main(int argc, char **argv) {
   char buf[10];
   char save = '\0';
   while (save != 'y' && save != 'Y' && save != 'n' && save != 'N') {
-    fgets(buf, sizeof(buf), stdin);
+    if (fgets(buf, sizeof(buf), stdin) == NULL) {
+      fprintf(stderr, "flash: no input, exiting\n");
+      exit(1);
+    }
     save = buf[0];
     switch (save) {
     case 'y':
@@ -172,10 +175,12 @@ int quiz_card(struct Card *card, size_t index, size_t total) {
   printf("[Enter]");
 
   while (1) {
-    fgets(buf, sizeof(buf), stdin);
+    if (fgets(buf, sizeof(buf), stdin) == NULL) {
+      fprintf(stderr, "flash: no input, exiting\n");
+      exit(1);
+    }
     c = buf[0];
-
-    if ((int)c == 10) {
+    if (c == '\n') {
       break;
     }
   }
@@ -183,7 +188,10 @@ int quiz_card(struct Card *card, size_t index, size_t total) {
 
   printf("Got it? [y/n] ");
   while (c != 'y' && c != 'Y' && c != 'n' && c != 'N') {
-    fgets(buf, sizeof(buf), stdin);
+    if (fgets(buf, sizeof(buf), stdin) == NULL) {
+      fprintf(stderr, "flash: no input, exiting\n");
+      exit(1);
+    }
     c = buf[0];
     switch (c) {
     case 'y':
