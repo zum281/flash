@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
   int score = 0;
   struct Card deck[MAX_DECK_SIZE];
 
-  loaded = load_cards(opts.filename, deck, MAX_DECK_SIZE);
+  loaded = load_cards(opts.filepath, deck, MAX_DECK_SIZE);
 
   if (loaded == 0) {
     printf("No cards loaded, exiting...\n");
@@ -37,6 +37,6 @@ int main(int argc, char **argv) {
   }
 
   show_score(score, loaded);
-  save_to_session(score, loaded, opts.filename);
+  save_to_session(score, loaded, get_filename(opts.filepath));
   return 0;
 }

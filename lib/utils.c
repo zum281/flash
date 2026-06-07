@@ -6,7 +6,7 @@
 
 struct FlashOpts get_opts(int argc, char **argv) {
   struct FlashOpts opts;
-  opts.filename = NULL;
+  opts.filepath = NULL;
   opts.no_shuffle = 0;
 
   for (int i = 1; i < argc; i++) {
@@ -17,19 +17,28 @@ struct FlashOpts get_opts(int argc, char **argv) {
     } else if (argv[i][0] == '-') {
       fprintf(stderr, "flash: invalid argument '%s'\n", argv[i]);
       exit(1);
-    } else if (opts.filename != NULL) {
+    } else if (opts.filepath != NULL) {
       fprintf(stderr, "flash: too many arguments (unexpected '%s')\n", argv[i]);
       exit(1);
     } else {
-      opts.filename = argv[i];
+      opts.filepath = argv[i];
     }
   }
 
-  if (opts.filename == NULL) {
+  if (opts.filepath == NULL) {
     print_usage(1);
   }
 
   return opts;
+}
+
+const char *get_filename(const char *filepath) {
+  const char *last_slash = strrchr(filepath, '/');
+
+  if (last_slash) {
+    return last_slash + 1;
+  }
+  return filepath;
 }
 
 void print_usage(int is_error) {
