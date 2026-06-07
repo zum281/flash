@@ -62,7 +62,6 @@ lib/score.c     scoring, session logging, and the startup summary
 lib/term.c      drawing cards centered in the terminal, reading y/n & Enter
 lib/alt_buf.c   alternate screen buffer handling (like vim/less)
 lib/utils.c     argument parsing, line validation and sanitization
-decks/          example decks
 flash.log       append-only log of past sessions
 ```
 
