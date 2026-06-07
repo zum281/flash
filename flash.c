@@ -18,7 +18,7 @@ enum CardState { SEPARATOR, QUESTION, ANSWER };
 int in_alternate = 0;
 
 size_t load_cards(const char *filename, struct Card *out, size_t capacity);
-void shuffle_cards(struct Card *deck, int size);
+void shuffle_cards(struct Card *deck, size_t size);
 int quiz_card(struct Card *card, size_t index, size_t total);
 int append_session(const char *log_filename, size_t total, size_t correct);
 void exit_alternate_buffer(void) {
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     exit(0);
   }
 
-  shuffle_cards(deck, (int)loaded);
+  shuffle_cards(deck, loaded);
 
   printf("loaded %zu cards\n", loaded);
 
@@ -59,11 +59,11 @@ int main(int argc, char **argv) {
     score += quiz_card(&deck[i], i + 1, loaded);
   }
 
-  double scorePerc = 100.0 * score / loaded;
+  double score_perc = 100.0 * score / loaded;
 
   printf("──────────────────────────────────────\n");
   printf("Session complete.\n");
-  printf("Score: %d/%zu (%.1f%%)\n", score, loaded, scorePerc);
+  printf("Score: %d/%zu (%.1f%%)\n", score, loaded, score_perc);
 
   printf("\n");
   printf("Save to session? [y/n] ");
@@ -150,12 +150,12 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
   return loaded;
 }
 
-void shuffle_cards(struct Card *deck, int size) {
+void shuffle_cards(struct Card *deck, size_t size) {
   time_t now = time(NULL);
   srand((unsigned)now);
 
-  for (int i = size - 1; i > 0; i--) {
-    int j = rand() % size;
+  for (size_t i = size - 1; i > 0; i--) {
+    size_t j = rand() % size;
     struct Card tmp = deck[j];
     deck[j] = deck[i];
     deck[i] = tmp;
