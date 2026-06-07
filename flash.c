@@ -18,6 +18,7 @@ enum CardState { SEPARATOR, QUESTION, ANSWER };
 int in_alternate = 0;
 
 void exit_alternate_buffer(void);
+void clear_screen(void);
 char *get_filename(int argc, char **argv);
 size_t load_cards(const char *filename, struct Card *out, size_t capacity);
 void shuffle_cards(struct Card *deck, size_t size);
@@ -47,9 +48,11 @@ int main(int argc, char **argv) {
   enter_alternate_buffer();
 
   for (size_t i = 0; i < loaded; i++) {
+    clear_screen();
     score += quiz_card(&deck[i], i + 1, loaded);
   }
 
+  clear_screen();
   show_score(score, loaded);
   save_to_session(score, loaded);
   return 0;
@@ -57,8 +60,14 @@ int main(int argc, char **argv) {
 
 void exit_alternate_buffer(void) {
   if (in_alternate) {
-    printf("\033[?1049l");
+    printf("\033[?25h");   // make cursor visible
+    printf("\033[?1049l"); // exit alternate buffer
   }
+}
+
+void clear_screen(void) {
+  printf("\033[2J"); // clear screen
+  printf("\033[H");  // move cursor HOME (0,0)
 }
 
 char *get_filename(int argc, char **argv) {
@@ -152,7 +161,8 @@ void shuffle_cards(struct Card *deck, size_t size) {
 }
 
 void enter_alternate_buffer(void) {
-  printf("\033[?1049h");
+  printf("\033[?25l");   // make cursor invisible
+  printf("\033[?1049h"); // enter alternate buffer
   in_alternate = 1;
 }
 
@@ -222,7 +232,6 @@ void show_score(int score, size_t total) {
 
   double score_perc = 100.0 * score / total;
 
-  printf("──────────────────────────────────────\n");
   printf("Session complete.\n");
   printf("Score: %d/%zu (%.1f%%)\n", score, total, score_perc);
 
