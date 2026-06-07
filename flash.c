@@ -37,6 +37,6 @@ int main(int argc, char **argv) {
   }
 
   show_score(score, loaded);
-  save_to_session(score, loaded);
+  save_to_session(score, loaded, opts.filename);
   return 0;
 }

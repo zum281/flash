@@ -8,7 +8,8 @@
 
 #define SCORE_LINES 2
 
-int append_session(const char *filename, size_t total, size_t correct) {
+int append_session(const char *filename, size_t total, size_t correct,
+                   char *deck_name) {
   FILE *fp;
   fp = fopen(filename, "a");
 
@@ -20,7 +21,7 @@ int append_session(const char *filename, size_t total, size_t correct) {
   char *now = ctime(&ts);
   now[strlen(now) - 1] = '\0';
 
-  fprintf(fp, "%s - %zu/%zu\n", now, correct, total);
+  fprintf(fp, "%s - %s - %zu/%zu\n", now, deck_name, correct, total);
   fclose(fp);
   return 0;
 }
@@ -38,7 +39,7 @@ void show_score(int score, size_t total) {
   print_card(rows, SCORE_LINES);
 }
 
-void save_to_session(int score, size_t total) {
+void save_to_session(int score, size_t total, char *deck_name) {
   char buf[10];
   char save = '\0';
 
@@ -54,7 +55,7 @@ void save_to_session(int score, size_t total) {
     switch (save) {
     case 'y':
     case 'Y':
-      if (!append_session("flash.log", total, score)) {
+      if (!append_session("flash.log", total, score, deck_name)) {
         print_line("Logged to flash.log\n");
       } else {
         perror("flash");
