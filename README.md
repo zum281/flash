@@ -4,6 +4,7 @@ A terminal flashcard quiz program written in C.
 
 This is a learning project, built while following
 [Beej's Guide to C Programming](https://beej.us/guide/bgc/) (up to chapter 9).
+
 Use at your own risk.
 
 ## What it does
@@ -26,14 +27,14 @@ make
 ## Usage
 
 ```sh
-./flash [--no-shuffle] [-h|--help] <deck-file>
+flash [--no-shuffle] [-h|--help] <deck-file>
 ```
 
 Examples:
 
 ```sh
-./flash decks/cards.txt
-./flash --no-shuffle ~/deck.txt
+flash decks/cards.txt
+flash --no-shuffle ~/deck.txt
 ```
 
 ## Deck file format
