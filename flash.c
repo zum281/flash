@@ -1,4 +1,3 @@
-#include "lib/term.h"
 #define _DEFAULT_SOURCE
 
 #include <stdio.h>
@@ -29,14 +28,17 @@ int main(int argc, char **argv) {
 
   const char *filename = get_filename(opts.filepath);
 
-  // TODO: print initial status
-  // print_status(filename);
-
   if (!opts.no_shuffle) {
     shuffle_cards(deck, loaded);
   }
 
   enter_alternate_buffer();
+
+  int start_new = print_summary(filename);
+
+  if (!start_new) {
+    exit(0);
+  }
 
   for (size_t i = 0; i < loaded; i++) {
     score += quiz_card(&deck[i], i + 1, loaded);

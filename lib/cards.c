@@ -7,6 +7,7 @@
 
 #include "cards.h"
 #include "term.h"
+#include "utils.h"
 
 #define QUESTION_LINES 3
 #define ANSWER_LINES 2
@@ -31,40 +32,31 @@ size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
       break;
     }
 
-    // Skip new lines
-    if (!strcmp(s, "\n")) {
+    int line_valid = validate_line(s);
+    if (!line_valid) {
       continue;
     }
 
-    // skip empty lines
-    if (strlen(s) == 0) {
-      continue;
-    }
-    // strip away \n
-    char *last_c = &s[strlen(s) - 1];
-    if (*last_c == '\n') {
-
-      *last_c = '\0';
-    }
+    char *line = sanitize_line(s);
 
     // Skip separator
-    if (!strcmp(s, separator)) {
+    if (!strcmp(line, separator)) {
       state = QUESTION;
       continue;
     }
 
     switch (state) {
     case SEPARATOR:
-      if (strcmp(s, separator)) {
-        fprintf(stderr, "flash: expected SEPARATOR, got %s. exiting\n", s);
+      if (strcmp(line, separator)) {
+        fprintf(stderr, "flash: expected SEPARATOR, got '%s'\n", line);
         exit(1);
       }
       break;
     case QUESTION:
-      strcpy(out[loaded].question, s);
+      strcpy(out[loaded].question, line);
       break;
     case ANSWER:
-      strcpy(out[loaded].answer, s);
+      strcpy(out[loaded].answer, line);
       loaded++;
       break;
     default:

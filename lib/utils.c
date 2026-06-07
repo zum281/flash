@@ -4,8 +4,11 @@
 
 #include "utils.h"
 
+char *log_filepath = "flash.log";
+
 struct FlashOpts get_opts(int argc, char **argv) {
   struct FlashOpts opts;
+
   opts.filepath = NULL;
   opts.no_shuffle = 0;
 
@@ -49,4 +52,35 @@ void print_usage(int is_error) {
   }
   printf("%s", usage);
   exit(0);
+}
+
+int validate_line(char *line) {
+
+  if (line == NULL) {
+    return 0;
+  }
+
+  if (strlen(line) == 0) {
+    return 0;
+  }
+  if (!strcmp(line, " ") || !strcmp(line, "\n")) {
+    return 0;
+  }
+  return 1;
+}
+
+char *sanitize_line(char *line) {
+  // trim initial whitescpace
+  while (*line == ' ')
+    line++;
+
+  // trim trailing whitespace
+  char *last_c = &line[strlen(line) - 1];
+
+  while (last_c >= line && (*last_c == ' ' || *last_c == '\n')) {
+    *last_c = '\0';
+    last_c--;
+  }
+
+  return line;
 }

@@ -70,11 +70,6 @@ void print_card(char rows[][MAX_LINE_SIZE], size_t size) {
   }
 }
 
-void print_summary(const char *filename) {
-  (void)filename;
-  printf("Summary");
-}
-
 void wait_for_enter(void) {
   char buf[10];
   char c = '\0';

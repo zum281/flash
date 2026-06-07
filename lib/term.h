@@ -13,7 +13,6 @@ int get_card_height(char rows[][MAX_LINE_SIZE], size_t size, int padding,
 void print_line(char *s);
 void print_card(char rows[][MAX_LINE_SIZE], size_t size);
 
-void print_summary(const char *filename);
 void wait_for_enter(void);
 int wait_for_yes_no(void);
 
