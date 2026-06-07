@@ -56,13 +56,13 @@ hold up to 100 cards (`MAX_DECK_SIZE`).
 ## Project layout
 
 ```
-flash.c         entry point and main quiz loop
+flash.c         entry point
 lib/cards.c     deck loading, shuffling, quizzing a single card
-lib/score.c     scoring, session logging, and the startup summary
+lib/score.c     scoring, session logging, startup summary
 lib/term.c      drawing cards centered in the terminal, reading y/n & Enter
-lib/alt_buf.c   alternate screen buffer handling (like vim/less)
+lib/alt_buf.c   alternate screen buffer handling
 lib/utils.c     argument parsing, line validation and sanitization
-flash.log       append-only log of past sessions
+flash.log       log of past sessions
 ```
 
 ## Notes
