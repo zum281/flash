@@ -17,25 +17,20 @@ struct Card {
 enum CardState { SEPARATOR, QUESTION, ANSWER };
 int in_alternate = 0;
 
+void exit_alternate_buffer(void);
+char *get_filename(int argc, char **argv);
 size_t load_cards(const char *filename, struct Card *out, size_t capacity);
 void shuffle_cards(struct Card *deck, size_t size);
+void enter_alternate_buffer(void);
 int quiz_card(struct Card *card, size_t index, size_t total);
 int append_session(const char *log_filename, size_t total, size_t correct);
-void exit_alternate_buffer(void) {
-  if (in_alternate) {
-    printf("\033[?1049l");
-  }
-}
+void show_score(int score, size_t total);
+void save_to_session(int score, size_t total);
 
 int main(int argc, char **argv) {
 
   atexit(exit_alternate_buffer);
-
-  if (argc < 2) {
-    printf("usage: flash <cards>\n");
-    return 1;
-  }
-  char *filename = argv[1];
+  char *filename = get_filename(argc, argv);
   size_t loaded;
   int score = 0;
   struct Card deck[MAX_DECK_SIZE];
@@ -49,50 +44,29 @@ int main(int argc, char **argv) {
 
   shuffle_cards(deck, loaded);
 
-  printf("loaded %zu cards\n", loaded);
-
-  // Enter alternate buffer
-  printf("\033[?1049h");
-  in_alternate = 1;
+  enter_alternate_buffer();
 
   for (size_t i = 0; i < loaded; i++) {
     score += quiz_card(&deck[i], i + 1, loaded);
   }
 
-  double score_perc = 100.0 * score / loaded;
-
-  printf("──────────────────────────────────────\n");
-  printf("Session complete.\n");
-  printf("Score: %d/%zu (%.1f%%)\n", score, loaded, score_perc);
-
-  printf("\n");
-  printf("Save to session? [y/n] ");
-
-  char buf[10];
-  char save = '\0';
-  while (save != 'y' && save != 'Y' && save != 'n' && save != 'N') {
-    if (fgets(buf, sizeof(buf), stdin) == NULL) {
-      fprintf(stderr, "flash: no input, exiting\n");
-      exit(1);
-    }
-    save = buf[0];
-    switch (save) {
-    case 'y':
-    case 'Y':
-      if (!append_session("flash.log", loaded, score)) {
-        printf("Logged to flash.log\n");
-      } else {
-        perror("flash");
-      }
-      break;
-    case 'n':
-    case 'N':
-      break;
-    default:
-      printf("Valid answers are y/n. Give your answer again [y/n] ");
-    }
-  };
+  show_score(score, loaded);
+  save_to_session(score, loaded);
   return 0;
+}
+
+void exit_alternate_buffer(void) {
+  if (in_alternate) {
+    printf("\033[?1049l");
+  }
+}
+
+char *get_filename(int argc, char **argv) {
+  if (argc < 2) {
+    printf("usage: flash <cards>\n");
+    exit(1);
+  }
+  return argv[1];
 }
 
 size_t load_cards(const char *filename, struct Card *out, size_t capacity) {
@@ -177,6 +151,11 @@ void shuffle_cards(struct Card *deck, size_t size) {
   }
 }
 
+void enter_alternate_buffer(void) {
+  printf("\033[?1049h");
+  in_alternate = 1;
+}
+
 int quiz_card(struct Card *card, size_t index, size_t total) {
   char buf[10];
   char c = '\0';
@@ -237,4 +216,44 @@ int append_session(const char *filename, size_t total, size_t correct) {
   fprintf(fp, "%s - %zu/%zu\n", now, correct, total);
   fclose(fp);
   return 0;
+}
+
+void show_score(int score, size_t total) {
+
+  double score_perc = 100.0 * score / total;
+
+  printf("──────────────────────────────────────\n");
+  printf("Session complete.\n");
+  printf("Score: %d/%zu (%.1f%%)\n", score, total, score_perc);
+
+  printf("\n");
+}
+
+void save_to_session(int score, size_t total) {
+  char buf[10];
+  char save = '\0';
+  printf("Save to session? [y/n] ");
+
+  while (save != 'y' && save != 'Y' && save != 'n' && save != 'N') {
+    if (fgets(buf, sizeof(buf), stdin) == NULL) {
+      fprintf(stderr, "flash: no input, exiting\n");
+      exit(1);
+    }
+    save = buf[0];
+    switch (save) {
+    case 'y':
+    case 'Y':
+      if (!append_session("flash.log", total, score)) {
+        printf("Logged to flash.log\n");
+      } else {
+        perror("flash");
+      }
+      break;
+    case 'n':
+    case 'N':
+      break;
+    default:
+      printf("Valid answers are y/n. Give your answer again [y/n] ");
+    }
+  };
 }
