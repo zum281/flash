@@ -83,6 +83,3 @@ flash.log       append-only log of past sessions
   ```sh
   printf '\033[?25h'
   ```
-
-  The cursor is hidden on startup with `\033[?25l` and only shown again from the
-  normal `atexit` exit path, which `SIGINT` bypasses.
