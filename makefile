@@ -3,8 +3,8 @@
 CC=clang
 CFLAGS=-Wall -Wextra -Werror -pedantic -std=c23
 
-SRC=flash.c
-OUT = $(SRC:.c=)
+SRC=flash.c lib/*.c
+OUT=flash
 
 $(OUT):$(SRC)
 	$(CC) $(CFLAGS) -o $(OUT) $(SRC)
